@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
               required
               autoComplete="email"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg text-white font-body px-4 py-3 focus:outline-none focus:border-amber-500/50 transition-colors placeholder-slate-700"
-              placeholder="admin@rccglp17.org"
+              placeholder="[EMAIL_ADDRESS]"
             />
           </div>
           <div>
