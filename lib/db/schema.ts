@@ -87,7 +87,7 @@ export const videoSermons = pgTable('video_sermons', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-export const contactMessages = pgTable('contact_messages', {
+export const contactmessages = pgTable('contactmessages', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull(),

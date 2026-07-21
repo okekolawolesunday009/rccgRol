@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureConnectCardsTable } from '@/lib/db';
 import { connectCards } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
 import { eq, desc } from 'drizzle-orm';
@@ -9,6 +9,8 @@ export async function GET() {
   if (!auth.authenticated) return auth.response;
 
   try {
+    await ensureConnectCardsTable();
+
     const list = await db
       .select()
       .from(connectCards)

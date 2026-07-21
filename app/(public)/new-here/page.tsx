@@ -2,19 +2,20 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import Section from '@/components/SectionProp';
-import { 
-  FaCalendarAlt, 
-  FaClock, 
-  FaMapMarkerAlt, 
-  FaTshirt, 
-  FaChild, 
-  FaHeart, 
-  FaUser, 
-  FaEnvelope, 
-  FaPhone, 
+import {
+  FaCalendarAlt,
+  FaClock,
+  FaMapMarkerAlt,
+  FaTshirt,
+  FaChild,
+  FaHeart,
+  FaUser,
+  FaEnvelope,
+  FaPhone,
   FaPaperPlane,
-  FaCheckCircle 
+  FaCheckCircle
 } from 'react-icons/fa';
 
 export default function NewHerePage() {
@@ -24,7 +25,6 @@ export default function NewHerePage() {
   const [visitorType, setVisitorType] = useState('first-time');
   const [interests, setInterests] = useState<string[]>([]);
   const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +59,13 @@ export default function NewHerePage() {
         throw new Error(data.error || 'Failed to submit connect card.');
       }
 
-      setSubmitted(true);
+      toast.success("We're thrilled you connected! Our team will reach out shortly.");
+      setName('');
+      setEmail('');
+      setPhone('');
+      setVisitorType('first-time');
+      setInterests([]);
+      setMessage('');
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
@@ -98,7 +104,7 @@ export default function NewHerePage() {
       {/* Pastor's Welcome Message */}
       <Section bgColor="bg-white" className="py-16">
         <div className="max-w-5xl mx-auto px-6 md:px-8">
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-12 items-center bg-slate-50 rounded-3xl p-8 md:p-12 border border-slate-100 shadow-sm"
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -107,8 +113,8 @@ export default function NewHerePage() {
           >
             {/* Pastor Profile Area */}
             <div className="flex flex-col items-center text-center space-y-4">
-              <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-200 flex items-center justify-center">
-                <span className="material-symbols-outlined text-7xl text-slate-400 font-light">person</span>
+              <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-md bg-slate-200 flex items-center justify-center relative">
+                <img src="/pastor.png" alt="Pastor" className="w-full h-full " />
               </div>
               <div>
                 <h3 className="font-headline text-2xl italic font-bold text-slate-900">Pastor-in-Charge</h3>
@@ -122,7 +128,7 @@ export default function NewHerePage() {
               <h2 className="font-headline text-3xl italic text-slate-900 font-bold">"You have a place in our family"</h2>
               <div className="text-slate-600 font-light text-sm md:text-base leading-relaxed space-y-4">
                 <p>
-                  We believe that church should be a sanctuary—a place where you can experience the presence of God, build meaningful friendships, and grow in your unique calling. 
+                  We believe that church should be a sanctuary—a place where you can experience the presence of God, build meaningful friendships, and grow in your unique calling.
                 </p>
                 <p>
                   At River of Life Sanctuary, our doors are open to people from all backgrounds, regardless of where they are on their spiritual journey. We don't expect you to have it all together, because none of us do. We are simply a group of believers walking together toward God's ultimate excellence.
@@ -147,7 +153,7 @@ export default function NewHerePage() {
             </p>
           </div>
 
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 gap-8"
             variants={containerVariants}
             initial="hidden"
@@ -213,29 +219,6 @@ export default function NewHerePage() {
           </div>
 
           <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 md:p-12 shadow-sm">
-            {submitted ? (
-              <motion.div 
-                className="text-center py-10 space-y-6"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <div className="flex justify-center text-emerald-500 text-6xl">
-                  <FaCheckCircle className="animate-bounce" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-slate-900">We're Thrilled You Connected!</h3>
-                  <p className="text-slate-600 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
-                    Thank you for filling out our Connect Card. A member of our welcome team will be in touch with you shortly. We look forward to meeting you!
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-8 py-3 rounded-lg transition shadow hover:shadow-md mt-6"
-                >
-                  Fill another card
-                </button>
-              </motion.div>
-            ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Name field */}
@@ -309,11 +292,10 @@ export default function NewHerePage() {
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {interestOptions.map((opt) => (
-                      <label 
-                        key={opt.id} 
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white cursor-pointer select-none transition hover:bg-slate-50/50 ${
-                          interests.includes(opt.id) ? 'border-amber-500/50 bg-amber-50/10' : ''
-                        }`}
+                      <label
+                        key={opt.id}
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white cursor-pointer select-none transition hover:bg-slate-50/50 ${interests.includes(opt.id) ? 'border-amber-500/50 bg-amber-50/10' : ''
+                          }`}
                       >
                         <input
                           type="checkbox"
@@ -357,7 +339,6 @@ export default function NewHerePage() {
                   </p>
                 )}
               </form>
-            )}
           </div>
         </div>
       </Section>

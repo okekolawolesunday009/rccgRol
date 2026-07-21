@@ -49,9 +49,9 @@ export default function Footer() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            <Link href="/" className="flex items-center gap-4 group">
-          <img src="/rccg.png" alt="RCCG LP17 HQ Logo" width={150} height={50} className="w-[150px] h-[50px] object-contain" />
-        </Link>
+            <Link href="/" className="flex items-center  justify-center lg:justify-start gap-4 group">
+              <img src="/rccg.png" alt="RCCG LP17 HQ Logo" width={150} height={50} className="w-[150px] h-[50px] object-contain" />
+            </Link>
             <p className="font-body text-xs tracking-widest uppercase opacity-70 text-amber-500">
               © {new Date().getFullYear()} RCCG LP17 HQ — River Of Life Sanctuary
             </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: 'RCCG LP17 HQ — The Digital Sanctuary',
@@ -27,6 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased  text-slate-100">
+        <Toaster position="top-right" />
         {children}
       </body>
     </html>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureConnectCardsTable } from '@/lib/db';
 import { connectCards } from '@/lib/db/schema';
 import { sendConnectCardNotification } from '@/lib/email';
 
@@ -11,6 +11,8 @@ export async function POST(request: Request) {
     if (!name || !email) {
       return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 });
     }
+
+    await ensureConnectCardsTable();
 
     const [newCard] = await db
       .insert(connectCards)
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
       .returning();
 
     // Send email notification — non-blocking
-    await sendConnectCardNotification({ name, email, phone, visitorType, interests, message });
+    sendConnectCardNotification({ name, email, phone, visitorType, interests, message }).catch(console.error);
 
     return NextResponse.json({ success: true, id: newCard.id });
   } catch (error: any) {

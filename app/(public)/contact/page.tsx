@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import Section from '@/components/SectionProp';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,17 +22,22 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, phone, subject, message }),
       });
+
+
 
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Failed to send message.');
       }
+      setLoading(false);
 
-      setSubmitted(true);
+      toast.success('Message sent successfully! We will get back to you shortly.');
       setName('');
       setEmail('');
+      setPhone('');
+      setSubject('');
       setMessage('');
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -105,79 +112,89 @@ export default function ContactPage() {
 
           {/* Form Card */}
           <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 md:p-12 shadow-sm">
-            {submitted ? (
-              <div className="text-center py-12 space-y-4">
-                <span className="material-symbols-outlined text-6xl text-emerald-500">done_all</span>
-                <h3 className="text-2xl font-bold text-white">Message Sent!</h3>
-                <p className="text-slate-300 text-sm">
-                  Thank you for reaching out. We will review your message and get back to you shortly.
-                </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="mt-6 bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg hover:bg-amber-400 transition-colors"
-                >
-                  Send another message
-                </button>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
-                    className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john@example.com"
-                    className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                />
+              </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Your message details here..."
-                    className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
+                  Phone Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1234567890"
+                  className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                />
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-50"
-                >
-                  {loading ? 'Sending...' : 'Send Message'}
-                </button>
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
+                  Subject (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="What is this regarding?"
+                  className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                />
+              </div>
 
-                {error && (
-                  <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
-                    {error}
-                  </p>
-                )}
-              </form>
-            )}
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">
+                  Message
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Your message details here..."
+                  className="w-full bg-white border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-amber-500 text-black font-bold py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-50"
+              >
+                {loading ? 'Sending...' : 'Send Message'}
+              </button>
+
+              {error && (
+                <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+                  {error}
+                </p>
+              )}
+            </form>
           </div>
         </div>
       </Section>

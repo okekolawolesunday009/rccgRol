@@ -118,8 +118,8 @@ export default function HeroSection() {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <span className="text-[10px] uppercase tracking-[0.5em]">Scroll to Explore</span>
-        <div className="w-px h-12 bg-white/50" />
+        {/* <span className="text-[10px] uppercase tracking-[0.5em]">Scroll to Explore</span>
+        <div className="w-px h-12 bg-white/50" /> */}
       </motion.div>
     </motion.main>
   );
