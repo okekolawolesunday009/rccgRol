@@ -6,8 +6,8 @@ import { adminUsers } from '../lib/db/schema.ts';
 import bcrypt from 'bcryptjs';
 
 async function main() {
-  const email = (process.env.SEED_ADMIN_EMAIL || 'admin@rccglp17.org').toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD || 'change-me';
+  const email = (process.env.SEED_ADMIN_EMAIL).toLowerCase();
+  const password = process.env.SEED_ADMIN_PASSWORD;
 
   const existing = await db.select().from(adminUsers);
   if (existing.length > 0) {
