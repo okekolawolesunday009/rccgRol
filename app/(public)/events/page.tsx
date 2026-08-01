@@ -12,8 +12,9 @@ const DEFAULT_METADATA: Metadata = {
   description: 'Join our upcoming church events, conferences, and special services. Register and share with friends.',
 };
 
-export async function generateMetadata({ searchParams }: { searchParams: { id?: string } }): Promise<Metadata> {
-  const eventId = searchParams.id ? Number(searchParams.id) : NaN;
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const searchParams = props?.searchParams as { id?: string };
+  const eventId = searchParams?.id ? Number(searchParams.id) : NaN;
   if (Number.isNaN(eventId)) {
     return DEFAULT_METADATA;
   }
