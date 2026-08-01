@@ -83,7 +83,7 @@ export default function Navbar() {
           <button
             id="navbar-menu-toggle"
             aria-label="Toggle navigation menu"
-            className={`md:hidden ${buttonTheme} transition-colors text-slate-100`}
+            className={`md:hidden ${buttonTheme} transition-colors text-slate-600`}
             onClick={() => setMenuOpen((o) => !o)}
           >
             <span className="material-symbols-outlined text-2xl">
