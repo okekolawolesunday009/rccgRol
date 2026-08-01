@@ -3,8 +3,16 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: 'RCCG LP17 HQ — The Digital Sanctuary',
-  description: 'A sanctuary for spiritual growth. Experience a modern expression of ancient faith in the heart of the city.',
+  title: {
+    default: 'RCCG LP17 HQ',
+    template: '%s — RCCG LP17 HQ',
+  },
+  description: 'The Province of Ultimate Excellence.',
+  icons: {
+    icon: '/rccg.png',
+    shortcut: '/rccg.png',
+    apple: '/rccg.png',
+  },
 };
 
 export default function RootLayout({
