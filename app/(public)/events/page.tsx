@@ -7,10 +7,20 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Ensure fresh data on request
 
+const SITE_URL = 'https://rccgrol-lp17.netlify.app';
+
 const DEFAULT_METADATA: Metadata = {
   title: 'Upcoming Events — RCCG LP17 HQ',
   description: 'Join our upcoming church events, conferences, and special services. Register and share with friends.',
 };
+
+function normalizeUrl(url?: string | null) {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return url.startsWith('/') ? `${SITE_URL}${url}` : `${SITE_URL}/${url}`;
+}
 
 export async function generateMetadata(props: any): Promise<Metadata> {
   try {
@@ -31,8 +41,8 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       return DEFAULT_METADATA;
     }
 
-    const imageUrl = event.imageUrl || undefined;
-    const pageUrl = `https://rccgrol-lp17.netlify.app/events?id=${eventId}`;
+    const imageUrl = normalizeUrl(event.imageUrl || undefined);
+    const pageUrl = `${SITE_URL}/events?id=${eventId}`;
     const description: string = event.description ?? DEFAULT_METADATA.description ?? '';
 
     return {

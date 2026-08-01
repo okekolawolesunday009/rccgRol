@@ -163,7 +163,8 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventDa
                     </div>
 
                     <div className="flex flex-wrap gap-3 mt-6">
-                      <button
+                      {event.registrationOpen && (
+                        <button
                         onClick={(e) => {
                           e.stopPropagation();
                           openRegister(event);
@@ -172,6 +173,8 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventDa
                       >
                         {event.registrationOpen ? event.ctaLabel || 'Register' : 'Registration Closed'}
                       </button>
+                      )}
+                     
                       <button
                         type="button"
                         onClick={(e) => {
