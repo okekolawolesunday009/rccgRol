@@ -33,6 +33,8 @@ export interface ChurchEvent {
   location: string;       // e.g. "Main Auditorium"
   description?: string | null;
   imageUrl?: string | null;
+  featured?: boolean | null;
+  displayOrder?: number | null;
   registerUrl?: string | null;
   shareUrl?: string | null;
   ctaLabel?: string | null;      // e.g. "Register" | "Details" | "Join Us"
@@ -42,12 +44,15 @@ export interface ChurchEvent {
 }
 
 export interface GalleryItem {
-  id: string;
+  id: string | number;
   imageUrls: string[];
   category: string;
   caption: string;
+  description?: string | null;
   colSpan?: number;
   rowSpan?: number;
+  displayOrder?: number | null;
+  status?: 'published' | 'draft' | string | null;
 }
 
 export type AdminTab = 'events' | 'blogs' | 'partners' | 'newsletter' | 'audio' | 'video';

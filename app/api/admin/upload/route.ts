@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { checkAdminAuthApi } from '@/lib/admin-check';
 import { uploadImageBuffer } from '@/lib/storage/local';
 
+// Uploads the received image to Cloudinary and returns only the secure URL.
+// The DB stores the returned URL string, not the binary image.
 export async function POST(request: Request) {
   const auth = await checkAdminAuthApi();
   if (!auth.authenticated) {

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   try {
     await ensureEventsTable();
     const body = await request.json();
-    const { title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic } = body;
+    const { title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic, featured, displayOrder } = body;
 
     if (!title || !date || !month || !time || !location) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -40,6 +40,8 @@ export async function POST(request: Request) {
       imageUrl: imageUrl || null,
       registrationOpen: registrationOpen ?? true,
       isPublic: isPublic ?? true,
+      featured: featured ?? false,
+      displayOrder: displayOrder ?? 0,
       registeredCount: 0,
     }).returning();
 
@@ -58,7 +60,7 @@ export async function PUT(request: Request) {
   try {
     await ensureEventsTable();
     const body = await request.json();
-    const { id, title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic } = body;
+    const { id, title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic, featured, displayOrder } = body;
 
     if (!id || !title || !date || !month || !time || !location) {
       return NextResponse.json({ error: 'Missing required fields or id' }, { status: 400 });
@@ -76,6 +78,8 @@ export async function PUT(request: Request) {
         imageUrl: imageUrl || null,
         registrationOpen: registrationOpen ?? true,
         isPublic: isPublic ?? true,
+        featured: featured ?? false,
+        displayOrder: displayOrder ?? 0,
       })
       .where(eq(events.id, Number(id)))
       .returning();

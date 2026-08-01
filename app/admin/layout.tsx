@@ -40,6 +40,7 @@ export default async function AdminLayout({
             {[
               { label: 'Inbox', href: '/admin/inbox' },
               { label: 'Events', href: '/admin/events' },
+              { label: 'Gallery', href: '/admin/gallery' },
               { label: 'Blogs & News', href: '/admin/blogs' },
               { label: 'Partners', href: '/admin/partners' },
               { label: 'Newsletter', href: '/admin/newsletter' },

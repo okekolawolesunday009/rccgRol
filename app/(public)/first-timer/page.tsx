@@ -60,7 +60,7 @@ export default async function FirstTimerPage() {
               <p className="mt-2 text-slate-600">Complete this form in less than 2 minutes. Your privacy is important to us.</p>
             </div>
 
-            <form action="/api/first-timer" className="space-y-6">
+            <form method="post" action="/api/first-timer" className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2 text-sm text-slate-700">
                   <span className="font-semibold">Full Name *</span>

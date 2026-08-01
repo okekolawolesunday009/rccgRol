@@ -19,7 +19,20 @@ export const events = pgTable('events', {
   imageUrl: text('image_url'),
   registrationOpen: boolean('registration_open').default(true),
   isPublic: boolean('is_public').default(true),
+  featured: boolean('featured').default(false),
+  displayOrder: integer('display_order').default(0),
   registeredCount: integer('registered_count').default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const galleryItems = pgTable('gallery_items', {
+  id: serial('id').primaryKey(),
+  category: text('category').notNull(),
+  caption: text('caption').notNull(),
+  description: text('description'),
+  imageUrls: text('image_urls').array().notNull(),
+  displayOrder: integer('display_order').default(0),
+  status: text('status').default('published'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 

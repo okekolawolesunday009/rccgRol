@@ -14,6 +14,8 @@ interface EventItem {
   ctaLabel?: string | null;
   registrationOpen?: boolean | null;
   isPublic?: boolean | null;
+  featured?: boolean | null;
+  displayOrder?: number | null;
   imageUrl?: string | null;
   registeredCount?: number | null;
 }
@@ -32,6 +34,8 @@ export default function AdminEventsPage() {
     ctaLabel: 'Register',
     registrationOpen: true,
     isPublic: true,
+    featured: false,
+    displayOrder: 0,
     imageUrl: '',
   });
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
@@ -99,6 +103,8 @@ export default function AdminEventsPage() {
       ctaLabel: 'Register',
       registrationOpen: true,
       isPublic: true,
+      featured: false,
+      displayOrder: 0,
       imageUrl: '',
     });
     setPreviewImage(null);
@@ -122,6 +128,8 @@ export default function AdminEventsPage() {
       ctaLabel: event.ctaLabel || 'Register',
       registrationOpen: event.registrationOpen ?? true,
       isPublic: event.isPublic ?? true,
+      featured: event.featured ?? false,
+      displayOrder: event.displayOrder ?? 0,
       imageUrl: event.imageUrl || '',
     });
     setPreviewImage(event.imageUrl || null);
@@ -222,7 +230,14 @@ export default function AdminEventsPage() {
                   <span className="text-slate-500 text-[9px] uppercase tracking-widest mt-1">{event.month.slice(0, 3)}</span>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-slate-950 font-bold text-base truncate">{event.title}</h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-slate-950 font-bold text-base truncate">{event.title}</h3>
+                    {event.featured ? (
+                      <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] font-bold">
+                        Featured
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="text-slate-500 text-xs mt-1 truncate">
                     {event.time} • {event.location} • <span className="text-amber-500 font-bold">{event.registeredCount || 0} Registrations</span>
                   </p>
@@ -355,7 +370,7 @@ export default function AdminEventsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <label className="flex items-center gap-3 text-sm text-slate-700">
                     <input
                       type="checkbox"
@@ -374,6 +389,27 @@ export default function AdminEventsPage() {
                     />
                     Public event
                   </label>
+                  <label className="flex items-center gap-3 text-sm text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={form.featured}
+                      onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                      className="h-4 w-4 rounded border-slate-300 bg-white text-amber-500 focus:ring-amber-500"
+                    />
+                    Featured on home
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2 font-bold">Home Display Order</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={form.displayOrder}
+                      onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })}
+                      className="w-full bg-white border border-slate-200 rounded-2xl text-slate-950 px-4 py-2.5 focus:outline-none focus:border-amber-500/50"
+                    />
+                  </div>
                 </div>
 
                 <div>

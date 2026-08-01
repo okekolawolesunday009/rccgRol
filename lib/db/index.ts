@@ -87,6 +87,8 @@ export async function ensureEventsTable() {
       image_url TEXT,
       registration_open BOOLEAN NOT NULL DEFAULT true,
       is_public BOOLEAN NOT NULL DEFAULT true,
+      featured BOOLEAN NOT NULL DEFAULT false,
+      display_order INTEGER DEFAULT 0,
       registered_count INTEGER DEFAULT 0,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     );
@@ -98,7 +100,34 @@ export async function ensureEventsTable() {
       ADD COLUMN IF NOT EXISTS image_url TEXT,
       ADD COLUMN IF NOT EXISTS registration_open BOOLEAN NOT NULL DEFAULT true,
       ADD COLUMN IF NOT EXISTS is_public BOOLEAN NOT NULL DEFAULT true,
+      ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT false,
+      ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0,
       ADD COLUMN IF NOT EXISTS registered_count INTEGER DEFAULT 0;
+  `);
+}
+
+export async function ensureGalleryItemsTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS gallery_items (
+      id SERIAL PRIMARY KEY,
+      category TEXT NOT NULL,
+      caption TEXT NOT NULL,
+      description TEXT,
+      image_urls TEXT[] NOT NULL,
+      display_order INTEGER DEFAULT 0,
+      status TEXT DEFAULT 'published',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    ALTER TABLE gallery_items
+      ADD COLUMN IF NOT EXISTS category TEXT NOT NULL,
+      ADD COLUMN IF NOT EXISTS caption TEXT NOT NULL,
+      ADD COLUMN IF NOT EXISTS description TEXT,
+      ADD COLUMN IF NOT EXISTS image_urls TEXT[] NOT NULL,
+      ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
   `);
 }
 

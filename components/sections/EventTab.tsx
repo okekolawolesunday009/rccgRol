@@ -36,22 +36,9 @@ function parseEventDate(event: ChurchEvent) {
   return eventDate;
 }
 
-function getCountdown(target: Date) {
-  const total = Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000));
-  const hours = Math.floor(total / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  return { total, hours, minutes, seconds };
-}
-
-function formatDateLabel(event: ChurchEvent) {
-  return `${event.month.slice(0, 3)} ${event.date} · ${event.time}`;
-}
-
 export default function EventTab() {
   const [events, setEvents] = useState<ChurchEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [countdown, setCountdown] = useState({ total: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     async function loadEvents() {
@@ -71,41 +58,22 @@ export default function EventTab() {
   }, []);
 
   const activeEvent = useMemo(() => {
-    if (!events || !events.length) return null;
+    if (!events.length) return null;
+
     const now = new Date();
     const upcomingEvents = events
-      .map(event => ({
-        event,
-        date: parseEventDate(event)
-      }))
-      .filter(({ date }) => date.getTime() > now.getTime())
+      .map((event) => ({ event, date: parseEventDate(event) }))
+      .filter(({ date }) => date.getTime() >= now.getTime())
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     return upcomingEvents.length > 0 ? upcomingEvents[0].event : events[0];
   }, [events]);
 
-  const currentTarget = useMemo(() => {
-    if (!activeEvent) return new Date();
-    return parseEventDate(activeEvent);
-  }, [activeEvent]);
-
-  useEffect(() => {
-    if (!activeEvent) return;
-    setCountdown(getCountdown(currentTarget));
-
-    const interval = window.setInterval(() => {
-      const next = getCountdown(currentTarget);
-      setCountdown(next);
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, [currentTarget, activeEvent]);
-
   if (loading) {
     return (
-      <section className="px-6 py-16 ">
-        <div className="max-w-5xl mx-auto rounded-3xl border border-white/10 px-6 py-10 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <div className="text-center text-sm text-slate-400">Loading event ticker...</div>
+      <section className="px-6 py-16">
+        <div className="max-w-5xl mx-auto rounded-3xl border border-slate-200 bg-white px-6 py-10 shadow-xl">
+          <div className="text-center text-sm text-slate-500">Loading events...</div>
         </div>
       </section>
     );
@@ -117,64 +85,71 @@ export default function EventTab() {
 
   return (
     <motion.section
-      className="px-3 py-8 bg-slate-950"
-      initial={{ opacity: 0, y: 40 }}
+      className="px-3 py-10 bg-slate-50"
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
     >
       <div className="max-w-5xl mx-auto">
-        <div className="rounded-[2rem] border border-white/10 p-4 shadow-2xl shadow-black/30 backdrop-blur-xl bg-slate-900/50">
-          <div className="overflow-x-auto">
-            <table className="min-w-[800px] w-full border-collapse border border-slate-800">
-              <thead>
-                <tr className="border-b border-slate-800">
-                  <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">Date & Time</th>
-                  <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">Event</th>
-                  <th className="px-4 py-3 text-center text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">Hours</th>
-                  <th className="px-4 py-3 text-center text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">Minutes</th>
-                  <th className="px-4 py-3 text-center text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">Seconds</th>
-                  <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.35em] text-slate-400 font-medium border-r border-slate-800">More Events</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-slate-800">
-                  <td className="px-4 py-6 align-top border-r border-slate-800">
-                    <p className="text-lg font-semibold text-white">{formatDateLabel(activeEvent)}</p>
-                    <p className="mt-2 text-xs text-slate-400">{activeEvent.location}</p>
-                  </td>
-                  <td className="px-4 py-6 align-top border-r border-slate-800" style={{width: '40%'}}>
-                    <p className="text-xl font-semibold leading-snug text-white">{activeEvent.title}</p>
-                    <p className="mt-2 text-sm text-slate-400">{activeEvent.description}</p>
-                  </td>
-                  <td className="px-4 py-6 text-center align-top border-r border-slate-800">
-                    <p className="text-3xl font-semibold tabular-nums text-white">{String(countdown.hours).padStart(2, '0')}</p>
-                  </td>
-                  <td className="px-4 py-6 text-center align-top border-r border-slate-800">
-                    <p className="text-3xl font-semibold tabular-nums text-white">{String(countdown.minutes).padStart(2, '0')}</p>
-                  </td>
-                  <td className="px-4 py-6 text-center align-top border-r border-slate-800">
-                    <p className="text-3xl font-semibold tabular-nums text-white">{String(countdown.seconds).padStart(2, '0')}</p>
-                  </td>
-                  <td className="px-4 py-6 align-top border-r border-slate-800">
-                    <a
-                      href="/events"
-                      className="block text-left transition hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-                    >
-                      <p className="text-lg font-semibold text-white">Browse the full schedule</p>
-                      <span className="mt-2 inline-flex items-center gap-2 text-sm text-amber-500">
-                        Open events page
-                        <span className="material-symbols-outlined text-base">east</span>
-                      </span>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl">
+          <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+            <div className="relative overflow-hidden bg-slate-100">
+              {activeEvent.imageUrl ? (
+                <img
+                  src={activeEvent.imageUrl}
+                  alt={activeEvent.title}
+                  className="h-full min-h-[280px] w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full min-h-[280px] items-center justify-center bg-slate-200 text-slate-500">
+                  <span className="text-sm uppercase tracking-[0.25em]">No image available</span>
+                </div>
+              )}
+            </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
-              <span>Next upcoming event</span>
-              <span aria-live="polite">Live countdown updates every second</span>
+            <div className="space-y-6 p-8 md:p-10">
+              <div className="inline-flex items-center gap-3 rounded-full bg-amber-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-amber-600">
+                <span>{activeEvent.month.slice(0, 3)} {activeEvent.date}</span>
+                <span className="text-slate-400">·</span>
+                <span>{activeEvent.time}</span>
+              </div>
+
+              <div>
+                <h2 className="text-3xl font-headline font-bold text-slate-950 tracking-tight">
+                  {activeEvent.title}
+                </h2>
+                {activeEvent.description ? (
+                  <p className="mt-4 text-slate-600 leading-8 text-sm md:text-base">
+                    {activeEvent.description}
+                  </p>
+                ) : (
+                  <p className="mt-4 text-slate-500 text-sm md:text-base">
+                    Join us for this upcoming event and discover more on the events page.
+                  </p>
+                )}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Time</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">{activeEvent.time}</p>
+                </div>
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Location</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">{activeEvent.location}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="/events"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  View all events
+                </a>
+                <span className="text-sm text-slate-500">Featured event preview</span>
+              </div>
             </div>
           </div>
         </div>
