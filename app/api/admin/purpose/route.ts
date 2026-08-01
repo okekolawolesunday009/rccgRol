@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { pageSettings } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 const upsertPageSettings = async (page: string, payload: Record<string, any>) => {
-  const existing = await db.select().from(pageSettings).where(pageSettings.page.eq(page));
+  const existing = await db.select().from(pageSettings).where(eq(pageSettings.page, page));
   if (existing.length > 0) {
-    await db.update(pageSettings).set({ payload: JSON.stringify(payload), updatedAt: sql`now()` }).where(pageSettings.page.eq(page));
+    await db.update(pageSettings).set({ payload: JSON.stringify(payload), updatedAt: sql`now()` }).where(eq(pageSettings.page, page));
   } else {
     await db.insert(pageSettings).values({ page, payload: JSON.stringify(payload) });
   }
