@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db, ensureEventsTable } from '@/lib/db';
 import { events } from '@/lib/db/schema';
 import EventsClient from './EventsClient';
 import { eq } from 'drizzle-orm';
@@ -13,41 +13,53 @@ const DEFAULT_METADATA: Metadata = {
 };
 
 export async function generateMetadata(props: any): Promise<Metadata> {
-  const searchParams = props?.searchParams as { id?: string };
-  const eventId = searchParams?.id ? Number(searchParams.id) : NaN;
-  if (Number.isNaN(eventId)) {
+  try {
+    await ensureEventsTable();
+    const searchParams = await Promise.resolve(props?.searchParams);
+    const idValue = Array.isArray(searchParams?.id)
+      ? searchParams.id[0]
+      : typeof searchParams?.id === 'string'
+      ? searchParams.id
+      : undefined;
+    const eventId = idValue ? Number(idValue) : NaN;
+    if (Number.isNaN(eventId)) {
+      return DEFAULT_METADATA;
+    }
+
+    const [event] = await db.select().from(events).where(eq(events.id, eventId));
+    if (!event) {
+      return DEFAULT_METADATA;
+    }
+
+    const imageUrl = event.imageUrl || undefined;
+    const pageUrl = `https://rccgrol-lp17.netlify.app/events?id=${eventId}`;
+    const description: string = event.description ?? DEFAULT_METADATA.description ?? '';
+
+    return {
+      title: `${event.title} — RCCG LP17 HQ`,
+      description,
+      openGraph: {
+        title: event.title,
+        description,
+        url: pageUrl,
+        type: 'website',
+        images: imageUrl ? [{ url: imageUrl, alt: event.title }] : undefined,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: event.title,
+        description,
+        images: imageUrl ? [imageUrl] : undefined,
+      },
+    };
+  } catch (error) {
     return DEFAULT_METADATA;
   }
-
-  const [event] = await db.select().from(events).where(eq(events.id, eventId));
-  if (!event) {
-    return DEFAULT_METADATA;
-  }
-
-  const imageUrl = event.imageUrl || undefined;
-  const pageUrl = `https://rccgrol-lp17.netlify.app/events?id=${eventId}`;
-
-  return {
-    title: `${event.title} — RCCG LP17 HQ`,
-    description: event.description || DEFAULT_METADATA.description,
-    openGraph: {
-      title: event.title,
-      description: event.description || DEFAULT_METADATA.description,
-      url: pageUrl,
-      type: 'website',
-      images: imageUrl ? [{ url: imageUrl, alt: event.title }] : undefined,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: event.title,
-      description: event.description || DEFAULT_METADATA.description,
-      images: imageUrl ? [imageUrl] : undefined,
-    },
-  };
 }
 
 export default async function EventsPage() {
-  const list = await db.select().from(events);
+  await ensureEventsTable();
+  const list = await db.select().from(events).where(eq(events.isPublic, true));
   
   // Format dates / types if necessary for serialization
   const serializedEvents = list.map(item => ({
@@ -56,5 +68,6 @@ export default async function EventsPage() {
     createdAt: item.createdAt?.toISOString(),
   }));
 
-  return <EventsClient initialEvents={serializedEvents} />;
+  const publicEvents = serializedEvents.filter((event) => event.isPublic !== false);
+  return <EventsClient initialEvents={publicEvents} />;
 }

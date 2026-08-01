@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 export const adminUsers = pgTable('admin_users', {
   id: serial('id').primaryKey(),
@@ -17,7 +17,44 @@ export const events = pgTable('events', {
   description: text('description'),
   ctaLabel: text('cta_label').default('Register'),
   imageUrl: text('image_url'),
+  registrationOpen: boolean('registration_open').default(true),
+  isPublic: boolean('is_public').default(true),
   registeredCount: integer('registered_count').default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const firstTimeVisitors = pgTable('first_time_visitors', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name').notNull(),
+  phoneNumber: text('phone_number').notNull(),
+  email: text('email'),
+  gender: text('gender'),
+  dateOfBirth: text('date_of_birth'),
+  homeAddress: text('home_address'),
+  city: text('city'),
+  state: text('state'),
+  firstTime: text('first_time').notNull().default('yes'),
+  visitDate: text('visit_date').notNull(),
+  serviceAttended: text('service_attended'),
+  invitationSource: text('invitation_source'),
+  invited: text('invited'),
+  invitedBy: text('invited_by'),
+  prayerRequest: text('prayer_request'),
+  contactPermission: text('contact_permission'),
+  preferredContactMethod: text('preferred_contact_method'),
+  additionalComments: text('additional_comments'),
+  followUpStatus: text('follow_up_status').notNull().default('New'),
+  createdBy: text('created_by').notNull().default('public'),
+  updatedBy: text('updated_by').notNull().default('public'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+export const visitorNotes = pgTable('visitor_notes', {
+  id: serial('id').primaryKey(),
+  visitorId: integer('visitor_id').notNull(),
+  note: text('note').notNull(),
+  adminName: text('admin_name').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 

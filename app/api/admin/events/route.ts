@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureEventsTable } from '@/lib/db';
 import { events } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
 import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
+    await ensureEventsTable();
     const list = await db.select().from(events);
     return NextResponse.json(list);
   } catch (error: any) {
@@ -20,8 +21,9 @@ export async function POST(request: Request) {
   }
 
   try {
+    await ensureEventsTable();
     const body = await request.json();
-    const { title, date, month, time, location, description, ctaLabel, imageUrl } = body;
+    const { title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic } = body;
 
     if (!title || !date || !month || !time || !location) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -36,6 +38,8 @@ export async function POST(request: Request) {
       description,
       ctaLabel: ctaLabel || 'Register',
       imageUrl: imageUrl || null,
+      registrationOpen: registrationOpen ?? true,
+      isPublic: isPublic ?? true,
       registeredCount: 0,
     }).returning();
 
@@ -52,8 +56,9 @@ export async function PUT(request: Request) {
   }
 
   try {
+    await ensureEventsTable();
     const body = await request.json();
-    const { id, title, date, month, time, location, description, ctaLabel, imageUrl } = body;
+    const { id, title, date, month, time, location, description, ctaLabel, imageUrl, registrationOpen, isPublic } = body;
 
     if (!id || !title || !date || !month || !time || !location) {
       return NextResponse.json({ error: 'Missing required fields or id' }, { status: 400 });
@@ -69,6 +74,8 @@ export async function PUT(request: Request) {
         description,
         ctaLabel: ctaLabel || 'Register',
         imageUrl: imageUrl || null,
+        registrationOpen: registrationOpen ?? true,
+        isPublic: isPublic ?? true,
       })
       .where(eq(events.id, Number(id)))
       .returning();
@@ -86,6 +93,7 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    await ensureEventsTable();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) {

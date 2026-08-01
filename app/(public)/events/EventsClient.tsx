@@ -13,6 +13,8 @@ interface EventData {
   location: string;
   description?: string | null;
   ctaLabel?: string | null;
+  registrationOpen?: boolean | null;
+  isPublic?: boolean | null;
   registeredCount?: number | null;
   imageUrl?: string | null;
 }
@@ -166,9 +168,9 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventDa
                           e.stopPropagation();
                           openRegister(event);
                         }}
-                        className="inline-flex items-center justify-center rounded-lg bg-amber-500 px-5 py-2 text-xs font-bold text-slate-950 transition hover:bg-amber-400 shadow-sm"
+                        className={`inline-flex items-center justify-center rounded-lg px-5 py-2 text-xs font-bold transition shadow-sm ${event.registrationOpen ? 'bg-amber-500 text-slate-950 hover:bg-amber-400' : 'bg-slate-200 text-slate-500 cursor-not-allowed'}`}
                       >
-                        {event.ctaLabel || 'Register'}
+                        {event.registrationOpen ? event.ctaLabel || 'Register' : 'Registration Closed'}
                       </button>
                       <button
                         type="button"
@@ -258,55 +260,63 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventDa
 
                 {/* Registration Form */}
                 <div className="pt-6 border-t border-slate-100">
-                  <h4 className="text-sm font-semibold text-slate-900 mb-4">Register for this Event</h4>
-                  {regSuccess ? (
-                    <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl p-6 text-center space-y-3">
-                      <span className="material-symbols-outlined text-4xl text-emerald-500 animate-bounce">
-                        check_circle
-                      </span>
-                      <h5 className="font-bold text-lg">Registration Successful!</h5>
-                      <p className="text-emerald-700 text-sm font-light">
-                        Thank you for registering. We look forward to seeing you at the event!
-                      </p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleRegister} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium">
-                            Full Name *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={regName}
-                            onChange={(e) => setRegName(e.target.value)}
-                            placeholder="John Doe"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium">
-                            Email Address *
-                          </label>
-                          <input
-                            type="email"
-                            required
-                            value={regEmail}
-                            onChange={(e) => setRegEmail(e.target.value)}
-                            placeholder="john@example.com"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
-                          />
-                        </div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-4">
+                    {selectedEvent.registrationOpen ? 'Register for this Event' : 'Event Registration Closed'}
+                  </h4>
+                  {selectedEvent.registrationOpen ? (
+                    regSuccess ? (
+                      <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl p-6 text-center space-y-3">
+                        <span className="material-symbols-outlined text-4xl text-emerald-500 animate-bounce">
+                          check_circle
+                        </span>
+                        <h5 className="font-bold text-lg">Registration Successful!</h5>
+                        <p className="text-emerald-700 text-sm font-light">
+                          Thank you for registering. We look forward to seeing you at the event!
+                        </p>
                       </div>
-                      <button
-                        type="submit"
-                        disabled={isRegistering}
-                        className="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-50 mt-4 shadow-sm"
-                      >
-                        {isRegistering ? 'Registering...' : selectedEvent.ctaLabel || 'Confirm Registration'}
-                      </button>
-                    </form>
+                    ) : (
+                      <form onSubmit={handleRegister} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium">
+                              Full Name *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={regName}
+                              onChange={(e) => setRegName(e.target.value)}
+                              placeholder="John Doe"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium">
+                              Email Address *
+                            </label>
+                            <input
+                              type="email"
+                              required
+                              value={regEmail}
+                              onChange={(e) => setRegEmail(e.target.value)}
+                              placeholder="john@example.com"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 px-4 py-3 focus:outline-none focus:border-amber-500/50"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={isRegistering}
+                          className="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-50 mt-4 shadow-sm"
+                        >
+                          {isRegistering ? 'Registering...' : selectedEvent.ctaLabel || 'Confirm Registration'}
+                        </button>
+                      </form>
+                    )
+                  ) : (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center text-slate-600">
+                      Registration is closed for this event.
+                    </div>
                   )}
                 </div>
               </div>

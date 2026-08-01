@@ -73,6 +73,78 @@ export async function ensureGiveSettingsTable() {
   `);
 }
 
+export async function ensureEventsTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS events (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      date TEXT NOT NULL,
+      month TEXT NOT NULL,
+      time TEXT NOT NULL,
+      location TEXT NOT NULL,
+      description TEXT,
+      cta_label TEXT DEFAULT 'Register',
+      image_url TEXT,
+      registration_open BOOLEAN NOT NULL DEFAULT true,
+      is_public BOOLEAN NOT NULL DEFAULT true,
+      registered_count INTEGER DEFAULT 0,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    ALTER TABLE events
+      ADD COLUMN IF NOT EXISTS cta_label TEXT DEFAULT 'Register',
+      ADD COLUMN IF NOT EXISTS image_url TEXT,
+      ADD COLUMN IF NOT EXISTS registration_open BOOLEAN NOT NULL DEFAULT true,
+      ADD COLUMN IF NOT EXISTS is_public BOOLEAN NOT NULL DEFAULT true,
+      ADD COLUMN IF NOT EXISTS registered_count INTEGER DEFAULT 0;
+  `);
+}
+
+export async function ensureFirstTimeVisitorsTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS first_time_visitors (
+      id SERIAL PRIMARY KEY,
+      full_name TEXT NOT NULL,
+      phone_number TEXT NOT NULL,
+      email TEXT,
+      gender TEXT,
+      date_of_birth TEXT,
+      home_address TEXT,
+      city TEXT,
+      state TEXT,
+      first_time TEXT NOT NULL DEFAULT 'yes',
+      visit_date TEXT NOT NULL,
+      service_attended TEXT,
+      invitation_source TEXT,
+      invited TEXT,
+      invited_by TEXT,
+      prayer_request TEXT,
+      contact_permission TEXT,
+      preferred_contact_method TEXT,
+      additional_comments TEXT,
+      follow_up_status TEXT NOT NULL DEFAULT 'New',
+      created_by TEXT NOT NULL DEFAULT 'public',
+      updated_by TEXT NOT NULL DEFAULT 'public',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+}
+
+export async function ensureVisitorNotesTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS visitor_notes (
+      id SERIAL PRIMARY KEY,
+      visitor_id INTEGER NOT NULL,
+      note TEXT NOT NULL,
+      admin_name TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+}
+
 export async function ensurePageSettingsTable() {
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS page_settings (

@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-slate-950 flex items-center justify-center px-4"
+      className="min-h-screen bg-slate-50 flex items-center justify-center px-4"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -48,11 +48,11 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="w-14 h-14 border-2 border-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 border-2 border-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 bg-white shadow-sm">
             <span className="text-amber-500 font-headline text-2xl italic font-bold">Ω</span>
           </div>
-          <h1 className="font-headline text-3xl text-white font-bold">RCCG LP17 HQ</h1>
-          <p className="text-slate-400 font-body text-sm mt-2 tracking-widest uppercase">
+          <h1 className="font-headline text-3xl text-slate-950 font-bold">RCCG LP17 HQ</h1>
+          <p className="text-slate-500 font-body text-sm mt-2 tracking-widest uppercase">
             Admin Portal
           </p>
         </div>
@@ -60,10 +60,10 @@ export default function AdminLoginPage() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl shadow-black/40"
+          className="bg-white border border-slate-200 rounded-[2rem] p-8 space-y-6 shadow-xl"
         >
           <div>
-            <label className="block text-xs font-body text-slate-400 uppercase tracking-widest mb-2">
+            <label className="block text-xs font-body text-slate-500 uppercase tracking-widest mb-2">
               Email
             </label>
             <input
@@ -73,12 +73,12 @@ export default function AdminLoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg text-white font-body px-4 py-3 focus:outline-none focus:border-amber-500/50 transition-colors placeholder-slate-700"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl text-slate-950 font-body px-4 py-3 focus:outline-none focus:border-amber-500/50 transition-colors placeholder-slate-400"
               placeholder="[EMAIL_ADDRESS]"
             />
           </div>
           <div>
-            <label className="block text-xs font-body text-slate-400 uppercase tracking-widest mb-2">
+            <label className="block text-xs font-body text-slate-500 uppercase tracking-widest mb-2">
               Password
             </label>
             <input
@@ -88,7 +88,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg text-white font-body px-4 py-3 focus:outline-none focus:border-amber-500/50 transition-colors placeholder-slate-700"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl text-slate-950 font-body px-4 py-3 focus:outline-none focus:border-amber-500/50 transition-colors placeholder-slate-400"
               placeholder="••••••••"
             />
           </div>
@@ -101,7 +101,7 @@ export default function AdminLoginPage() {
             id="admin-login-submit"
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-500 text-slate-950 font-bold tracking-widest uppercase text-sm py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-amber-500 text-slate-950 font-bold tracking-widest uppercase text-sm py-3 rounded-xl hover:bg-amber-400 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? 'Authenticating...' : 'Sign In'}
           </button>
