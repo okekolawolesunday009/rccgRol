@@ -43,7 +43,18 @@ const supportReasons = [
   },
 ];
 
-const givingOptions = [
+type DonationDetail = {
+  label: string;
+  value: string;
+};
+
+type GivingOption = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+const givingOptions: GivingOption[] = [
   {
     icon: '🏦',
     title: 'Bank Transfer',
@@ -91,7 +102,7 @@ export default function GivePage() {
   const heroDescription = pageSettings?.heroDescription || 'Use the details below for secure bank transfers or tap Give Now to explore additional options.';
   const thankYouHeadline = pageSettings?.thankYouHeadline || 'Thank You for Your Generosity';
   const thankYouCopy = pageSettings?.thankYouCopy || 'Every gift makes an eternal impact. Thank you for partnering with us to share hope, faith, and care.';
-  const currentDonationDetails = pageSettings?.donationDetails || [
+  const currentDonationDetails: DonationDetail[] = pageSettings?.donationDetails || [
     { label: 'Bank Name', value: 'FIRST CITY MONUMENT BANK' },
     { label: 'Account Name', value: 'REDEEMED CHRISTIAN CHURCH OF GOD RIVER OF LIFE PARISH' },
     { label: 'Account Number', value: '0256742018' },
@@ -128,36 +139,36 @@ export default function GivePage() {
         </div>
       </Section>
 
-      <Section bgColor="bg-white" className="py-20">
+      <Section bgColor="bg-white" className="py-16">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="grid gap-10 xl:grid-cols-[1.35fr_0.9fr]">
-            <div className="space-y-8">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 shadow-sm shadow-slate-200/50 sm:p-10">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="grid gap-8 xl:grid-cols-[1.35fr_0.9fr]">
+            <div className="space-y-6">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/50 sm:p-8">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-600">Why Give?</p>
-                    <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+                    <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                       Gifts that grow disciples, serve community, and expand the gospel.
                     </h2>
                   </div>
-                  <p className="max-w-md text-sm leading-7 text-slate-600">
+                  <p className="max-w-sm text-sm leading-6 text-slate-600">
                     Your support helps build discipleship, outreach, community care, and leadership development.
                   </p>
                 </div>
 
-                <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
                   {supportReasons.map((item) => (
                     <div
                       key={item.title}
-                      className="group rounded-3xl border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg"
+                      className="group rounded-3xl border border-slate-200 bg-white p-4 transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg"
                     >
                       <div
-                        className={`mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br ${item.accent} text-2xl shadow-lg shadow-slate-200/50`}
+                        className={`mb-4 flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br ${item.accent} text-xl shadow-lg shadow-slate-200/50`}
                       >
                         <span>{item.icon}</span>
                       </div>
-                      <h3 className="text-xl font-semibold text-slate-950">{item.title}</h3>
-                      <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
+                      <h3 className="text-lg font-semibold text-slate-950">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
                     </div>
                   ))}
                 </div>
