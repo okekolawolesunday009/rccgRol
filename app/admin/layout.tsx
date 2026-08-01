@@ -44,7 +44,9 @@ export default async function AdminLayout({
               { label: 'Blogs & News', href: '/admin/blogs' },
               { label: 'Partners', href: '/admin/partners' },
               { label: 'Newsletter', href: '/admin/newsletter' },
-              { label: 'Give', href: '/admin/give' },
+              { label: 'Give Page', href: '/admin/give-page' },
+              { label: 'Purpose Page', href: '/admin/purpose' },
+              { label: 'Give Projects', href: '/admin/give' },
             ].map((tab) => (
               <Link
                 key={tab.label}

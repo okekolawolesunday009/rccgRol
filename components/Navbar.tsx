@@ -8,11 +8,11 @@ import { BiDonateHeart } from "react-icons/bi";
 
 const navLinks = [
   { label: 'Our Story', href: '#about' },
-  { label: 'Community', href: '#gallery' },
-  { label: 'Events', href: '/events' },
-  { label: 'Blogs', href: '/blogs' },
-  { label: 'Projects', href: '/projects' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Gallery', href: '#gallery' },
+  { label: 'Programs', href: '/events' },
+  { label: 'Blogs', href: '/' },
+  { label: 'Projects', href: '/' },
+  { label: 'Contact Us', href: '/contact' },
 ];
 
 export default function Navbar() {
@@ -71,12 +71,12 @@ export default function Navbar() {
         {/* Right Actions */}
         <div className="flex items-center gap-4">
           <Link
-            href="/projects"
+            href="/give"
             className="hidden md:block font-headline italic text-lg tracking-tight transition-all duration-300 text-slate-300 hover:text-amber-400"
           >
             <span className='flex space-x-2 items-center'>
-              <BiDonateHeart className="inline text-2xl text-red-500" />
-              <span>Give</span>
+              <BiDonateHeart className="inline text-2xl text-sky-600" />
+              <span className={"text-black"}>Give</span>
             </span>
           </Link>
           {/* Mobile Menu Button */}
@@ -119,7 +119,7 @@ export default function Navbar() {
               </a>
             ))}
             <Link
-              href="/projects"
+              href="/give"
               onClick={() => setMenuOpen(false)}
               className="block font-headline italic text-xl py-2 text-slate-300 hover:text-amber-100"
             >

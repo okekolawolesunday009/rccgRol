@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp } from 'drizzle-orm/pg-core';
 
 export const adminUsers = pgTable('admin_users', {
   id: serial('id').primaryKey(),
@@ -54,6 +54,26 @@ export const giveProjects = pgTable('give_projects', {
   goal: text('goal').default(''),
   order: integer('order').default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const givePageSettings = pgTable('give_page_settings', {
+  id: serial('id').primaryKey(),
+  heroTitle: text('hero_title').notNull(),
+  heroSubtitle: text('hero_subtitle').notNull(),
+  heroDescription: text('hero_description').notNull(),
+  thankYouHeadline: text('thank_you_headline').notNull(),
+  thankYouCopy: text('thank_you_copy').notNull(),
+  donationDetails: text('donation_details').notNull().default('[]'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+export const pageSettings = pgTable('page_settings', {
+  id: serial('id').primaryKey(),
+  page: text('page').notNull().unique(),
+  payload: text('payload').notNull().default('{}'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
 export const newsletter = pgTable('newsletter', {
