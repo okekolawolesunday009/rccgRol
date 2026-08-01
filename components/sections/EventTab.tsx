@@ -91,6 +91,18 @@ export default function EventTab() {
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
     >
+
+       <div className="mx-auto mb-12 max-w-3xl text-center">
+          <p className="text-amber-400 uppercase tracking-[0.35em] text-xs font-semibold mb-3">
+            Featured Events
+          </p>
+          <h2 className="text-4xl text-black md:text-5xl font-headline font-extrabold tracking-tight">
+            Join the moments that matter most.
+          </h2>
+          <p className="mt-4 text-slate-500 text-sm md:text-base leading-7">
+            Explore our top upcoming events with the same clean presentation used on the events page.
+          </p>
+        </div>
       <div className="max-w-5xl mx-auto">
         <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl">
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">

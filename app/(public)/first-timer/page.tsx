@@ -1,13 +1,9 @@
-import { cookies } from 'next/headers';
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import Section from '@/components/SectionProp';
 import { motion } from 'framer-motion';
-import { db, ensurePageSettingsTable } from '@/lib/db';
-import { firstTimeVisitors } from '@/lib/db/schema';
-import { desc } from 'drizzle-orm';
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 const SERVICE_OPTIONS = [
   'First Service',
@@ -28,11 +24,39 @@ const SOURCE_OPTIONS = [
   'Other',
 ];
 
-function formatDate(value: string) {
-  return value;
-}
+export default function FirstTimerPage() {
+  const today = new Date().toISOString().split('T')[0];
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function FirstTimerPage() {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+
+    try {
+      const res = await fetch('/api/first-timer', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to submit visitor information.');
+      }
+
+      toast.success('Thank you for checking in! Someone from our team will follow up soon.');
+      (e.currentTarget as HTMLFormElement).reset();
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      toast.error(err.message || 'Unable to submit the form.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Section bgColor="bg-slate-100" className="py-16 border-b border-slate-200">
@@ -60,7 +84,7 @@ export default async function FirstTimerPage() {
               <p className="mt-2 text-slate-600">Complete this form in less than 2 minutes. Your privacy is important to us.</p>
             </div>
 
-            <form method="post" action="/api/first-timer" className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2 text-sm text-slate-700">
                   <span className="font-semibold">Full Name *</span>
@@ -197,11 +221,17 @@ export default async function FirstTimerPage() {
                 <p>Your information is used only to welcome you and follow up after your visit. We will not share your details publicly.</p>
               </div>
 
+              {error && (
+                <p className="text-sm text-red-600 bg-red-100 rounded-2xl px-4 py-3">
+                  {error}
+                </p>
+              )}
               <button
                 type="submit"
-                className="w-full rounded-3xl bg-amber-500 px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-slate-950 shadow-sm transition hover:bg-amber-400"
+                disabled={loading}
+                className="w-full rounded-3xl bg-amber-500 px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-slate-950 shadow-sm transition hover:bg-amber-400 disabled:opacity-60"
               >
-                Submit Visitor Card
+                {loading ? 'Submitting...' : 'Submit Visitor Card'}
               </button>
             </form>
           </div>

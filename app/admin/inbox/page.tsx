@@ -28,6 +28,30 @@ interface ConnectCard {
   createdAt?: string | null;
 }
 
+interface FirstTimeVisitor {
+  id: number;
+  fullName: string;
+  phoneNumber: string;
+  email?: string | null;
+  gender?: string | null;
+  dateOfBirth?: string | null;
+  homeAddress?: string | null;
+  city?: string | null;
+  state?: string | null;
+  firstTime?: string | null;
+  visitDate?: string | null;
+  serviceAttended?: string | null;
+  invitationSource?: string | null;
+  invited?: string | null;
+  invitedBy?: string | null;
+  prayerRequest?: string | null;
+  contactPermission?: string | null;
+  preferredContactMethod?: string | null;
+  additionalComments?: string | null;
+  followUpStatus?: string | null;
+  createdAt?: string | null;
+}
+
 // ─── Shared UI helpers ────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: string }) {
@@ -484,17 +508,157 @@ function ConnectCardsTab() {
   );
 }
 
+function FirstTimeVisitorsTab() {
+  const [visitors, setVisitors] = useState<FirstTimeVisitor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  useEffect(() => { fetchVisitors(); }, []);
+
+  const fetchVisitors = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/inbox?type=first-time');
+      if (res.ok) setVisitors(await res.json());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = visitors.filter(
+    (visitor) =>
+      visitor.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      visitor.email?.toLowerCase().includes(search.toLowerCase()) ||
+      visitor.phoneNumber.toLowerCase().includes(search.toLowerCase()) ||
+      visitor.invitationSource?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const newCount = visitors.filter((v) => v.followUpStatus === 'New').length;
+
+  return (
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <p className="text-slate-400 text-sm">
+          Total: <span className="text-white font-bold">{visitors.length}</span>
+          {newCount > 0 && (
+            <span className="ml-3 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+              {newCount} new
+            </span>
+          )}
+        </p>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search visitors..."
+          className="w-full md:w-64 bg-slate-900 border border-slate-800 rounded-lg text-white px-4 py-2 focus:outline-none focus:border-amber-500/50 text-sm placeholder-slate-500"
+        />
+      </div>
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : filtered.length === 0 ? (
+        <EmptyState icon="person" label="No first-time visitor submissions yet." />
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((visitor) => (
+            <div
+              key={visitor.id}
+              className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden"
+            >
+              <div
+                className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-800/40 transition-colors"
+                onClick={() => setExpanded(expanded === visitor.id ? null : visitor.id)}
+              >
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-amber-500 flex-shrink-0 font-bold text-sm">
+                    {visitor.fullName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-white font-semibold text-sm truncate">{visitor.fullName}</p>
+                    <p className="text-slate-400 text-xs truncate">{visitor.email ?? visitor.phoneNumber}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                  <span className="text-slate-500 text-xs hidden md:block">
+                    {visitor.visitDate ?? 'No visit date'}
+                  </span>
+                  <span className="material-symbols-outlined text-slate-500 text-base transition-transform" style={{ transform: expanded === visitor.id ? 'rotate(180deg)' : 'none' }}>
+                    expand_more
+                  </span>
+                </div>
+              </div>
+
+              {expanded === visitor.id && (
+                <div className="px-6 pb-6 pt-2 border-t border-slate-800 space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Phone</p>
+                      <p className="text-slate-300">{visitor.phoneNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Visit Date</p>
+                      <p className="text-slate-300">{visitor.visitDate ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">First Time?</p>
+                      <p className="text-slate-300">{visitor.firstTime ?? '-'}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Service</p>
+                      <p className="text-slate-300">{visitor.serviceAttended ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Referral</p>
+                      <p className="text-slate-300">{visitor.invitationSource ?? '-'}</p>
+                    </div>
+                  </div>
+
+                  {visitor.prayerRequest && (
+                    <div className="bg-slate-950 rounded-xl p-4 border border-slate-800">
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">Prayer Request</p>
+                      <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">{visitor.prayerRequest}</p>
+                    </div>
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Contact Permission</p>
+                      <p className="text-slate-300">{visitor.contactPermission ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Preferred Contact</p>
+                      <p className="text-slate-300">{visitor.preferredContactMethod ?? '-'}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Submitted</p>
+                  <p className="text-slate-300 text-sm">{visitor.createdAt ? new Date(visitor.createdAt).toLocaleString() : '-'}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Inbox Page ──────────────────────────────────────────────────────────
 
 export default function AdminInboxPage() {
-  const [activeTab, setActiveTab] = useState<'contacts' | 'cards'>('contacts');
+  const [activeTab, setActiveTab] = useState<'contacts' | 'cards' | 'firstTimers'>('contacts');
 
   return (
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-headline italic font-bold text-white">Inbox</h1>
         <p className="text-slate-400 text-sm mt-1">
-          Manage contact form messages and new-visitor connect cards.
+          Manage contact form messages, new visitor cards, and first-time visitor submissions.
         </p>
       </div>
 
@@ -503,6 +667,7 @@ export default function AdminInboxPage() {
         {([
           { key: 'contacts', label: 'Contact Messages', icon: 'mail' },
           { key: 'cards', label: 'Connect Cards', icon: 'person_add' },
+          { key: 'firstTimers', label: 'First-Time Visitors', icon: 'person' },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -528,7 +693,7 @@ export default function AdminInboxPage() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
         >
-          {activeTab === 'contacts' ? <ContactTab /> : <ConnectCardsTab />}
+          {activeTab === 'contacts' ? <ContactTab /> : activeTab === 'cards' ? <ConnectCardsTab /> : <FirstTimeVisitorsTab />}
         </motion.div>
       </AnimatePresence>
     </div>

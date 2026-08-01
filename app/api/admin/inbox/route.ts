@@ -1,14 +1,26 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { contactmessages } from '@/lib/db/schema';
+import { db, ensureFirstTimeVisitorsTable } from '@/lib/db';
+import { contactmessages, firstTimeVisitors } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
 import { eq, desc } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await checkAdminAuthApi();
   if (!auth.authenticated) return auth.response;
 
   try {
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type');
+
+    if (type === 'first-time' || type === 'first_time') {
+      await ensureFirstTimeVisitorsTable();
+      const visitors = await db
+        .select()
+        .from(firstTimeVisitors)
+        .orderBy(desc(firstTimeVisitors.createdAt));
+      return NextResponse.json(visitors);
+    }
+
     const list = await db
       .select()
       .from(contactmessages)

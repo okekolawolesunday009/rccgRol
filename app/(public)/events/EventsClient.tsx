@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import Section from '@/components/SectionProp';
 
@@ -64,14 +65,18 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventDa
 
       if (res.ok) {
         setRegSuccess(true);
-        // Increment count locally
-        selectedEvent.registeredCount = (selectedEvent.registeredCount || 0) + 1;
+        setSelectedEvent({
+          ...selectedEvent,
+          registeredCount: (selectedEvent.registeredCount || 0) + 1,
+        });
+        toast.success('Registration successful! We look forward to seeing you at the event.');
       } else {
-        alert('Failed to register. Please try again.');
+        const data = await res.json();
+        toast.error(data?.error || 'Failed to register. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('An error occurred. Please try again.');
+      toast.error(err?.message || 'An error occurred. Please try again.');
     } finally {
       setIsRegistering(false);
     }
