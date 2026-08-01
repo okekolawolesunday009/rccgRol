@@ -77,6 +77,7 @@ export default function GivePage() {
         if (!res.ok) return;
         const data = await res.json();
         setPageSettings(data);
+        console.log('Give page settings loaded:', data);
       } catch (error) {
         console.error('Failed to load Give page settings', error);
       }

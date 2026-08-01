@@ -2,20 +2,36 @@
 
 import { useEffect, useState } from 'react';
 
+const DEFAULT_SETTINGS = {
+  heroTitle: 'Your generosity helps advance the mission, support discipleship, and transform lives through Christ.',
+  heroSubtitle: 'A modern giving page designed for clarity, trust, and easy access to donation details.',
+  heroDescription: 'Use the details below for secure bank transfers or tap Give Now to explore additional options.',
+  thankYouHeadline: 'Thank You for Your Generosity',
+  thankYouCopy: 'Every gift makes an eternal impact. Thank you for partnering with us to share hope, faith, and care.',
+  donationDetails: [
+     { label: 'Bank Name', value: 'FIRST CITY MONUMENT BANK' },
+    { label: 'Account Name', value: 'REDEEMED CHRISTIAN CHURCH OF GOD RIVER OF LIFE PARISH' },
+    { label: 'Account Number', value: '0256742018' },
+    { label: 'Reference', value: 'GIVE2026' },
+  ],
+};
 
 
 export default function AdminGivePage() {
-  const [settings, setSettings] = useState<any>();
+  const [settings, setSettings] = useState<any>({ ...DEFAULT_SETTINGS });
+  const [donationDetailsJson, setDonationDetailsJson] = useState<string>(JSON.stringify(DEFAULT_SETTINGS.donationDetails, null, 2));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const res = await fetch('/api/admin/give-page');
+        const res = await fetch('/api/admin/give-settings');
         if (res.ok) {
           const data = await res.json();
-          setSettings({ ...data });
+          const merged = { ...DEFAULT_SETTINGS, ...data };
+          setSettings(merged);
+          setDonationDetailsJson(JSON.stringify(merged.donationDetails ?? DEFAULT_SETTINGS.donationDetails, null, 2));
         }
       } catch (err) {
         console.error(err);
@@ -34,16 +50,36 @@ export default function AdminGivePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/give-page', {
+      let parsedDonationDetails = DEFAULT_SETTINGS.donationDetails;
+      try {
+        parsedDonationDetails = JSON.parse(donationDetailsJson);
+        if (!Array.isArray(parsedDonationDetails)) {
+          throw new Error('Donation details must be an array.');
+        }
+      } catch (parseError) {
+        throw new Error('Donation details JSON is invalid. Please fix it before saving.');
+      }
+
+      const payload = {
+        ...settings,
+        donationDetails: parsedDonationDetails,
+      };
+
+      const res = await fetch('/api/admin/give-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Failed to save settings');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to save settings');
+      }
+
+      setSettings(payload);
       alert('Give page settings saved successfully.');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Unable to save settings.');
+      alert(err?.message || 'Unable to save settings.');
     } finally {
       setSaving(false);
     }
@@ -73,7 +109,7 @@ export default function AdminGivePage() {
             <label className="space-y-2">
               <span className="text-sm font-semibold text-slate-300">Hero Title</span>
               <textarea
-                value={settings.heroTitle}
+                value={settings?.heroTitle ?? ''}
                 onChange={(e) => handleChange('heroTitle', e.target.value)}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-white"
                 rows={3}
@@ -82,7 +118,7 @@ export default function AdminGivePage() {
             <label className="space-y-2">
               <span className="text-sm font-semibold text-slate-300">Hero Subtitle</span>
               <textarea
-                value={settings.heroSubtitle}
+                value={settings?.heroSubtitle ?? ''}
                 onChange={(e) => handleChange('heroSubtitle', e.target.value)}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-white"
                 rows={3}
@@ -93,7 +129,7 @@ export default function AdminGivePage() {
           <label className="space-y-2">
             <span className="text-sm font-semibold text-slate-300">Hero Description</span>
             <textarea
-              value={settings.heroDescription}
+              value={settings?.heroDescription ?? ''}
               onChange={(e) => handleChange('heroDescription', e.target.value)}
               className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-white"
               rows={4}
@@ -104,7 +140,7 @@ export default function AdminGivePage() {
             <label className="space-y-2">
               <span className="text-sm font-semibold text-slate-300">Thank You Headline</span>
               <input
-                value={settings.thankYouHeadline}
+                value={settings?.thankYouHeadline ?? ''}
                 onChange={(e) => handleChange('thankYouHeadline', e.target.value)}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-white"
               />
@@ -112,7 +148,7 @@ export default function AdminGivePage() {
             <label className="space-y-2">
               <span className="text-sm font-semibold text-slate-300">Thank You Copy</span>
               <textarea
-                value={settings.thankYouCopy}
+                value={settings?.thankYouCopy ?? ''}
                 onChange={(e) => handleChange('thankYouCopy', e.target.value)}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-white"
                 rows={4}
@@ -124,8 +160,8 @@ export default function AdminGivePage() {
             <h2 className="text-lg font-semibold text-white">Donation Details JSON</h2>
             <p className="text-sm text-slate-400 mt-1">Update the donation items array below.</p>
             <textarea
-              value={JSON.stringify(settings.donationDetails || [], null, 2)}
-              onChange={(e) => handleChange('donationDetails', JSON.parse(e.target.value))}
+              value={donationDetailsJson}
+              onChange={(e) => setDonationDetailsJson(e.target.value)}
               className="mt-4 w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-white font-mono"
               rows={10}
             />

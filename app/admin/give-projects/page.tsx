@@ -49,7 +49,7 @@ export default function AdminGivePage() {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/give');
+      const res = await fetch('/api/admin/give-projects');
       if (res.ok) {
         const data = await res.json();
         setProjects(data ?? []);
@@ -84,7 +84,7 @@ export default function AdminGivePage() {
 
     try {
       const method = editingId ? 'PUT' : 'POST';
-      const endpoint = '/api/admin/give';
+      const endpoint = '/api/admin/give-projects';
       const body = JSON.stringify({ id: editingId, ...form });
 
       const res = await fetch(endpoint, {
@@ -114,7 +114,7 @@ export default function AdminGivePage() {
   const handleDelete = async (id: number) => {
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/admin/give?id=${id}`, {
+      const res = await fetch(`/api/admin/give-projects?id=${id}`, {
         method: 'DELETE',
       });
 

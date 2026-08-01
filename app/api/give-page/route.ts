@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureGiveSettingsTable } from '@/lib/db';
 import { givePageSettings } from '@/lib/db/schema';
 
 const DEFAULT_GIVE_PAGE_SETTINGS = {
@@ -23,7 +23,8 @@ const parseGiveSettings = (row: any) => ({
 
 export async function GET() {
   try {
-    const [row] = await db.select().from(givePageSettings).all();
+    await ensureGiveSettingsTable();
+    const [row] = await db.select().from(givePageSettings);
     if (!row) {
       return NextResponse.json(DEFAULT_GIVE_PAGE_SETTINGS);
     }

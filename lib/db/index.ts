@@ -57,3 +57,19 @@ export async function ensureContactTable() {
   `);
 }
 
+export async function ensureGiveSettingsTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS give_page_settings (
+      id SERIAL PRIMARY KEY,
+      hero_title TEXT NOT NULL,
+      hero_subtitle TEXT NOT NULL,
+      hero_description TEXT NOT NULL,
+      thank_you_headline TEXT NOT NULL,
+      thank_you_copy TEXT NOT NULL,
+      donation_details TEXT NOT NULL DEFAULT '[]',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+}
+

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensureGiveSettingsTable } from '@/lib/db';
 import { givePageSettings } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 const DEFAULT_GIVE_PAGE_SETTINGS = {
   heroTitle: 'Your generosity helps advance the mission, support discipleship, and transform lives through Christ.',
@@ -19,7 +19,8 @@ const DEFAULT_GIVE_PAGE_SETTINGS = {
 };
 
 const upsertGiveSettings = async (payload: Record<string, any>) => {
-  const existing = await db.select().from(givePageSettings).all();
+  await ensureGiveSettingsTable();
+  const existing = await db.select().from(givePageSettings);
   if (existing.length > 0) {
     await db.update(givePageSettings)
       .set({
@@ -31,7 +32,7 @@ const upsertGiveSettings = async (payload: Record<string, any>) => {
         donationDetails: JSON.stringify(payload.donationDetails || []),
         updatedAt: sql`now()`,
       })
-      .where(givePageSettings.id.eq(existing[0].id));
+      .where(eq(givePageSettings.id, existing[0].id));
   } else {
     await db.insert(givePageSettings).values({
       heroTitle: payload.heroTitle,
@@ -55,7 +56,8 @@ const parseRow = (row: any) => ({
 
 export async function GET() {
   try {
-    const [row] = await db.select().from(givePageSettings).all();
+    await ensureGiveSettingsTable();
+    const [row] = await db.select().from(givePageSettings);
     if (!row) {
       return NextResponse.json(DEFAULT_GIVE_PAGE_SETTINGS);
     }
