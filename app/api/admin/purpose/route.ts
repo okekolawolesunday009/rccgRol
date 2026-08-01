@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, ensurePageSettingsTable } from '@/lib/db';
 import { pageSettings } from '@/lib/db/schema';
 import { checkAdminAuthApi } from '@/lib/admin-check';
 import { eq, sql } from 'drizzle-orm';
 
 const upsertPageSettings = async (page: string, payload: Record<string, any>) => {
+  await ensurePageSettingsTable();
   const existing = await db.select().from(pageSettings).where(eq(pageSettings.page, page));
   if (existing.length > 0) {
     await db.update(pageSettings).set({ payload: JSON.stringify(payload), updatedAt: sql`now()` }).where(eq(pageSettings.page, page));
@@ -15,7 +16,8 @@ const upsertPageSettings = async (page: string, payload: Record<string, any>) =>
 
 export async function GET() {
   try {
-    const [row] = await db.select().from(pageSettings).where(pageSettings.page.eq('purpose'));
+    await ensurePageSettingsTable();
+    const [row] = await db.select().from(pageSettings).where(eq(pageSettings.page, 'purpose'));
     if (!row) {
       return NextResponse.json({ page: 'purpose', payload: {} });
     }

@@ -73,3 +73,15 @@ export async function ensureGiveSettingsTable() {
   `);
 }
 
+export async function ensurePageSettingsTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS page_settings (
+      id SERIAL PRIMARY KEY,
+      page TEXT NOT NULL UNIQUE,
+      payload TEXT NOT NULL DEFAULT '{}',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+}
+
