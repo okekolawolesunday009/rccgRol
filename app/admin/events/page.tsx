@@ -31,6 +31,7 @@ export default function AdminEventsPage() {
     imageUrl: '',
   });
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -83,37 +84,71 @@ export default function AdminEventsPage() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setForm({
+      title: '',
+      date: '',
+      month: '',
+      time: '',
+      location: '',
+      description: '',
+      ctaLabel: 'Register',
+      imageUrl: '',
+    });
+    setPreviewImage(null);
+    setEditingEventId(null);
+  };
+
+  const openAddModal = () => {
+    resetForm();
+    setShowAddModal(true);
+  };
+
+  const openEditModal = (event: EventItem) => {
+    setEditingEventId(event.id);
+    setForm({
+      title: event.title,
+      date: event.date,
+      month: event.month,
+      time: event.time,
+      location: event.location,
+      description: event.description || '',
+      ctaLabel: event.ctaLabel || 'Register',
+      imageUrl: event.imageUrl || '',
+    });
+    setPreviewImage(event.imageUrl || null);
+    setShowAddModal(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
+
     try {
+      const method = editingEventId ? 'PUT' : 'POST';
+      const body = editingEventId ? { ...form, id: editingEventId } : form;
       const res = await fetch('/api/admin/events', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(body),
       });
 
       if (res.ok) {
-        const newEv = await res.json();
-        setEvents((prev) => [newEv, ...prev]);
+        const savedEvent = await res.json();
+        if (editingEventId) {
+          setEvents((prev) => prev.map((item) => (item.id === savedEvent.id ? savedEvent : item)));
+        } else {
+          setEvents((prev) => [savedEvent, ...prev]);
+        }
         setShowAddModal(false);
-        setForm({
-          title: '',
-          date: '',
-          month: '',
-          time: '',
-          location: '',
-          description: '',
-          ctaLabel: 'Register',
-          imageUrl: '',
-        });
-        setPreviewImage(null);
+        resetForm();
       } else {
-        alert('Failed to create event');
+        const errorData = await res.json();
+        alert(errorData?.error || 'Failed to save event');
       }
     } catch (err) {
       console.error(err);
-      alert('Error creating event');
+      alert('Error saving event');
     } finally {
       setActionLoading(false);
     }
@@ -148,7 +183,7 @@ export default function AdminEventsPage() {
           <p className="text-slate-400 text-sm mt-1">Add, review, and delete church events.</p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           className="bg-amber-500 text-slate-950 px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-amber-400 transition-colors"
         >
           <span className="material-symbols-outlined text-sm font-bold">add</span>
@@ -187,30 +222,39 @@ export default function AdminEventsPage() {
               </div>
 
               <div className="flex items-center gap-3 self-end sm:self-auto">
-                {deleteConfirmId === event.id ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDelete(event.id)}
-                      disabled={actionLoading}
-                      className="text-red-500 hover:text-red-400 font-bold text-xs uppercase tracking-widest disabled:opacity-50"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirmId(null)}
-                      className="text-slate-400 hover:text-white text-xs uppercase tracking-widest"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setDeleteConfirmId(event.id)}
-                    className="text-slate-400 hover:text-red-500 transition-colors"
+                    onClick={() => openEditModal(event)}
+                    className="text-slate-400 hover:text-amber-500 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-lg">delete</span>
+                    <span className="material-symbols-outlined text-lg">edit</span>
                   </button>
-                )}
+
+                  {deleteConfirmId === event.id ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        disabled={actionLoading}
+                        className="text-red-500 hover:text-red-400 font-bold text-xs uppercase tracking-widest disabled:opacity-50"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirmId(null)}
+                        className="text-slate-400 hover:text-white text-xs uppercase tracking-widest"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setDeleteConfirmId(event.id)}
+                      className="text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -229,7 +273,9 @@ export default function AdminEventsPage() {
               exit={{ scale: 0.95, opacity: 0 }}
             >
               <div className="flex justify-between items-center px-6 py-5 border-b border-slate-800 bg-slate-900/50">
-                <h3 className="font-headline text-xl text-white font-bold">Add Church Event</h3>
+                <h3 className="font-headline text-xl text-white font-bold">
+                  {editingEventId ? 'Edit Church Event' : 'Add Church Event'}
+                </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="text-slate-400 hover:text-white"
@@ -238,7 +284,7 @@ export default function AdminEventsPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleCreate} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              <form onSubmit={handleSave} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2 font-bold">Event Title *</label>
                   <input
@@ -345,7 +391,7 @@ export default function AdminEventsPage() {
                     disabled={actionLoading}
                     className="flex-1 bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition-all disabled:opacity-50"
                   >
-                    {actionLoading ? 'Creating...' : 'Create Event'}
+                    {actionLoading ? (editingEventId ? 'Saving...' : 'Creating...') : editingEventId ? 'Save Changes' : 'Create Event'}
                   </button>
                   <button
                     type="button"

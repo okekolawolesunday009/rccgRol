@@ -7,6 +7,7 @@ import {
   FaYoutube,
   FaTwitter,
   FaInstagram,
+  FaTiktok,
 } from 'react-icons/fa';
 
 const navigationLinks = [
@@ -27,7 +28,7 @@ const socialLinks = [
   {
     icon: <FaFacebook />,
     label: 'Facebook',
-    href: 'https://facebook.com/rccglp17',
+    href: 'https://www.facebook.com/share/1BfoEX8Bpd/',
   },
   {
     icon: <FaYoutube />,
@@ -35,15 +36,16 @@ const socialLinks = [
     href: 'https://youtube.com/rccglp17',
   },
   {
-    icon: <FaInstagram />,
-    label: 'Instagram',
-    href: 'https://instagram.com/rccglp17',
+    icon: <FaTiktok/>,
+    label: 'TikTok',
+    href: 'https://vm.tiktok.com/ZS9hMMKcN23vG-utJLF/',
   },
   {
-    icon: <FaTwitter />,
-    label: 'Twitter',
-    href: 'https://twitter.com/rccglp17',
-  },
+    icon: <FaInstagram />,
+    label: 'Instagram',
+    href: 'https://www.instagram.com/rccglp17rol/',
+  }
+ 
 ];
 
 function FooterColumn({

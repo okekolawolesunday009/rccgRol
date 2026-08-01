@@ -45,6 +45,40 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  const auth = await checkAdminAuthApi();
+  if (!auth.authenticated) {
+    return auth.response;
+  }
+
+  try {
+    const body = await request.json();
+    const { id, title, date, month, time, location, description, ctaLabel, imageUrl } = body;
+
+    if (!id || !title || !date || !month || !time || !location) {
+      return NextResponse.json({ error: 'Missing required fields or id' }, { status: 400 });
+    }
+
+    const [updatedEvent] = await db.update(events)
+      .set({
+        title,
+        date,
+        month,
+        time,
+        location,
+        description,
+        ctaLabel: ctaLabel || 'Register',
+        imageUrl: imageUrl || null,
+      })
+      .where(eq(events.id, Number(id)))
+      .returning();
+
+    return NextResponse.json(updatedEvent);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to update event' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   const auth = await checkAdminAuthApi();
   if (!auth.authenticated) {
